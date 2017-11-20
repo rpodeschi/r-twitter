@@ -3,7 +3,8 @@
 # Date:     November 19, 2017    
 # Author:   RJ Podeschi
 #
-# Required Libraries: twitteR, ROAuth, curl
+# Required Libraries: twitteR, ROAuth, curl, tm, streamR, base64enc, caTools, SnowballC,
+#                     wordcloud
 # 
 # Purpose:  Connect to Twitter using Developer API, retrieve a pre-defined set of Tweets,
 #           pre-process data, and return a WordCloud.
