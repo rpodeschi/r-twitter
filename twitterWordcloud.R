@@ -53,7 +53,7 @@ tweets = searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="e
 
 tweets = do.call("rbind", lapply(tweets, as.data.frame))
 # Set directory to a specific directory on your workstation to save tweets
-write.csv(tweets,file="C:/Users/rpodeschi/Dropbox/millikin/teaching/IS470/R/Twitter/tweets.csv")
+write.csv(tweets,file="C:/Path/to/your/file/tweets.csv")
 some_tweets = tweets 
 #some_txt = sapply(some_tweets, function(x) x$getText())
 some_txt = some_tweets$text
