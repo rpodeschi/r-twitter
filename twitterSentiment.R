@@ -14,6 +14,7 @@
 #             Retrieved from: http://isedj.org/2017-15/n3/ISEDJv15n3p42.pdf
 
 #           Sentiment Analysis also adopted by: https://analyzecore.com/2014/04/28/twitter-sentiment-analysis/
+#           See https://sites.google.com/site/miningtwitter/questions/sentiment/analysis for more examples
 #
 #           Before proceeding, user must set up a Twitter API Application at http://apps.twitter.com
 #           see authenticate.R
