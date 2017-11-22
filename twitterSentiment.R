@@ -16,32 +16,11 @@
 #           Sentiment Analysis also adopted by: https://analyzecore.com/2014/04/28/twitter-sentiment-analysis/
 #
 #           Before proceeding, user must set up a Twitter API Application at http://apps.twitter.com
-#           
-# Run lines 19 - 34 first.
-require(twitteR)
-require(ROAuth)
-require(curl)
+#           see authenticate.R
+# 
 
-download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
-reqURL <- 'https://api.twitter.com/oauth/request_token'
-accessURL <- 'https://api.twitter.com/oauth/access_token'
-authURL <- 'https://api.twitter.com/oauth/authorize'
+# libraries
 
-# Replace ConsumerKey and ConsumerSecret with your API valudes from apps.twitter.com
-consumerKey <- 'XXXXXX' 
-consumerSecret <- 'XXXXXX' 
-Cred <- OAuthFactory$new(consumerKey=consumerKey,consumerSecret=consumerSecret,requestURL=reqURL,accessURL=accessURL,authURL=authURL)
-
-# Pause here to auth through browser, enter PIN, press enter. Then, run lines 12 - 16
-# Replace access_token and access_secret with your API valudes from apps.twitter.com
-access_token = 'XXXXXX' 
-access_secret= 'XXXXXX'
-save(Cred, file='twitter authentication.Rdata')
-load('twitter authentication.Rdata') 
-setup_twitter_oauth(consumerKey,consumerSecret,access_token,access_secret)
-# Twitter API now authenticated
-
-# Begin harvesting tweets
 require(tm)
 require(streamR)
 require(base64enc)
@@ -57,7 +36,7 @@ tweets.list <- searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, l
 tweets.df = twListToDF(tweets.list)
 
 # Set directory to a specific directory on your workstation to save tweets
-write.csv(tweets.df, file='C:/Path/to/your/directory/tweets.csv', row.names=F)
+write.csv(tweets.df, file='data/tweets.csv', row.names=F)
 
 # Create function to score sentiment
 score.sentiment <- function(sentences, pos.words, neg.words, .progress='none')
@@ -84,13 +63,13 @@ score.sentiment <- function(sentences, pos.words, neg.words, .progress='none')
 
 # Supply location of your project folder
 # Read in location of positive and negative word lists
-pos <- scan('C:/Path/to/your/directory/positive-words.txt', what='character', comment.char=';')
-neg <- scan('C:/Path/to/your/directory/negative-words.txt', what='character', comment.char=';')
+pos <- scan('positive-words.txt', what='character', comment.char=';')
+neg <- scan('negative-words.txt', what='character', comment.char=';')
 # Add a few more words to each list -- can customize
 pos.words <- c(pos, 'upgrade')
 neg.words <- c(neg, 'wtf', 'wait', 'waiting', 'epicfail')
 
-DataSetTweets <- read.csv("C:/Path/to/your/directory/tweets.csv")
+DataSetTweets <- read.csv("data/tweets.csv")
 DataSetTweets$text <- as.factor(DataSetTweets$text)
 DataSetTweets$text <- as.factor(DataSetTweets$text)
 
@@ -98,7 +77,7 @@ DataSetTweets$text <- as.factor(DataSetTweets$text)
 tweets.scores = score.sentiment(DataSetTweets$text, pos.words, neg.words, .progress='text')
 
 # Write scores to tweetScores.csv
-path<-"C:/Path/to/your/directory/"
+path <- "c:/users/rpodeschi/Documents/r-twitter/data"
 write.csv(tweets.scores, file=paste(path,"tweetScores.csv", sep=""), row.names=TRUE)
 
 # View histogram of scores. Scores > 0 are positive, Scores < 0 are negative. 0 is neutral
