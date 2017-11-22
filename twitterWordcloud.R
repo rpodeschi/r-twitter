@@ -14,6 +14,7 @@
 #             Retrieved from: http://isedj.org/2017-15/n3/ISEDJv15n3p42.pdf
 #
 #           Before proceeding, user must set up a Twitter API Application at http://apps.twitter.com
+#           see authenticate.R
 #           
 
 # libraries
@@ -88,7 +89,7 @@ corpus  <-  tm_map(corpus, removePunctuation)
 corpus  <-  tm_map(corpus, stripWhitespace)
 corpus  <-  tm_map(corpus,PlainTextDocument)
 
-# Execute WordCloud
+# Make WordCloud
 
 corpus_txt = iconv(corpus$content$content, to = "utf-8", sub="")
 wordcloud(corpus, scale=c(4,0.5), max.words=150, random.order=FALSE, rot.per=0.35, use.r.layout=FALSE, colors=brewer.pal(8, "Dark2"))
