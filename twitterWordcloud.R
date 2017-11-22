@@ -15,59 +15,35 @@
 #
 #           Before proceeding, user must set up a Twitter API Application at http://apps.twitter.com
 #           
-# Run lines 2 - 11 first.
-require(twitteR)
-require(ROAuth)
-require(curl)
 
-download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
-reqURL <- 'https://api.twitter.com/oauth/request_token'
-accessURL <- 'https://api.twitter.com/oauth/access_token'
-authURL <- 'https://api.twitter.com/oauth/authorize'
+# libraries
 
-# Replace ConsumerKey and ConsumerSecret with your API valudes from apps.twitter.com
-consumerKey <- 'XXXXXXXXXX' 
-consumerSecret <- 'XXXXXXXXXX' 
-Cred <- OAuthFactory$new(consumerKey=consumerKey,consumerSecret=consumerSecret,requestURL=reqURL,accessURL=accessURL,authURL=authURL)
+library(tidyverse)
+library(magrittr)
 
-# Pause here to auth through browser, enter PIN, press enter. Then, run lines 12 - 16
-# Replace access_token and access_secret with your API valudes from apps.twitter.com
-access_token = 'XXXXXXXXXX' 
-access_secret= 'XXXXXXXXXX'
-save(Cred, file='twitter authentication.Rdata')
-load('twitter authentication.Rdata') 
-setup_twitter_oauth(consumerKey,consumerSecret,access_token,access_secret)
-# Twitter API now authenticated
+library(tm)
+library(streamR)
+library(base64enc)
+library(caTools)
+library(SnowballC)
+library(twitteR)
 
-# Begin harvesting tweets
-require(tm)
-require(streamR)
-require(base64enc)
-require(caTools)
-require(SnowballC)
+library(wordcloud)
+
+# Harvest tweets
 
 # Pulls tweets for a given search string since a provided date. Uncomment/Comment for variation
-tweets = searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="en", since="2017-11-13", resultType="recent")
+tweets_orig = searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="en", since="2017-11-13", resultType="recent")
 # Pulls tweets for a given search string for a given geographical circle.
 # tweets = searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="en", geocode="37.7749,-122.4194,100 mi", since="2017-10-29", resultType="recent")
 
-tweets = do.call("rbind", lapply(tweets, as.data.frame))
-# Set directory to a specific directory on your workstation to save tweets
-write.csv(tweets,file="C:/Path/to/your/file/tweets.csv")
-some_tweets = tweets 
-#some_txt = sapply(some_tweets, function(x) x$getText())
-some_txt = some_tweets$text
-some_txt = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", "", some_txt)
-some_txt = gsub("@\\w+", "", some_txt)
-some_txt = gsub("&amp;\\w+","", some_txt)
-some_txt = gsub("[[:punct:]]", "", some_txt)
-some_txt = gsub("[[:digit:]]", "", some_txt)
-some_txt = gsub("http\\w+", "", some_txt)
-some_txt = gsub("^\\s+|\\s+$", "", some_txt)
-some_txt = gsub("[^[:graph:]]", " ", some_txt)
-some_txt = gsub("amp","", some_txt)
-some_txt = gsub("http","", some_txt)
-some_txt = gsub("htt","", some_txt)
+tweets <- do.call("rbind", lapply(tweets_orig, as.data.frame)) %>%
+  as.tibble()
+  
+write.csv(tweets,file="data/tweets.csv")
+
+# process tweets
+
 try.error = function(x)
 {
   y = NA
@@ -76,18 +52,45 @@ try.error = function(x)
     y = tolower(x)
   return(y)
 }
-some_txt = sapply(some_txt, try.error)
+
+some_tweets <- tweets %>%
+  select(doc_id = id, text, everything()) %>%
+  mutate(
+    text = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", "", text)
+    , text = gsub("@\\w+", "", text)
+    , text = gsub("&amp;\\w+","", text)
+    , text = gsub("[[:punct:]]", "", text)
+    , text = gsub("[[:digit:]]", "", text)
+    , text = gsub("http\\w+", "", text)
+    , text = gsub("^\\s+|\\s+$", "", text)
+    , text = gsub("[^[:graph:]]", " ", text)
+    , text = gsub("amp","", text)
+    , text = gsub("http","", text)
+    , text = gsub("htt","", text)
+  )
+  
+some_tweets$text <-  sapply(some_tweets$text, try.error)
 
 # replace monidaymotivation with same hashtag from search string.
-some_txt = gsub("mondaymotivation", "", some_txt)
-corpus = Corpus(VectorSource(some_txt))
-corpus = tm_map(corpus, removeWords, stopwords("english"))
-corpus = tm_map(corpus, removePunctuation)
-corpus = tm_map(corpus, stripWhitespace)
-corpus = tm_map(corpus,PlainTextDocument)
-corpus = iconv(corpus, to = "utf-8", sub="")
+some_tweets %<>%
+  mutate(
+    text = gsub("mondaymotivation", "", text)
+  )
+
+# build corpus from text --------------------------------------------------
+
+corpus  <- some_tweets %>% 
+  DataframeSource() %>% 
+  Corpus()
+
+corpus  <-  tm_map(corpus, removeWords, stopwords("english"))
+corpus  <-  tm_map(corpus, removePunctuation)
+corpus  <-  tm_map(corpus, stripWhitespace)
+corpus  <-  tm_map(corpus,PlainTextDocument)
 
 # Execute WordCloud
-require(wordcloud)
+
+corpus_txt = iconv(corpus$content$content, to = "utf-8", sub="")
 wordcloud(corpus, scale=c(4,0.5), max.words=150, random.order=FALSE, rot.per=0.35, use.r.layout=FALSE, colors=brewer.pal(8, "Dark2"))
+
 
