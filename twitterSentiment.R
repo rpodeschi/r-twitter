@@ -21,12 +21,15 @@
 
 # libraries
 
-require(tm)
-require(streamR)
-require(base64enc)
-require(caTools)
-require(SnowballC)
-require(ggplot2)
+library(tm)
+library(streamR)
+library(base64enc)
+library(caTools)
+library(SnowballC)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+library(caret)
 
 # Pulls tweets for a given search string since a provided date. Uncomment/Comment for variation
 tweets.list <- searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="en", since="2017-11-13", resultType="recent")
@@ -82,3 +85,32 @@ write.csv(tweets.scores, file=paste(path,"tweetScores.csv", sep=""), row.names=T
 
 # View histogram of scores. Scores > 0 are positive, Scores < 0 are negative. 0 is neutral
 ggplot(tweets.scores, aes(x=score)) + geom_histogram(bins=27) + theme_bw()
+
+# Create sentiment score categories
+some_tweets$score <- tweets.scores$score
+write.csv(some_tweets, file="data/tweetsandscores.csv", row.names=TRUE) 
+some_tweets$scorescat[some_tweets$score < 0] <- "Negative"
+some_tweets$scorescat[some_tweets$scores >= 0] <- "Not Negative"
+some_tweets$scorescat = as.factor(some_tweets$scorescat)
+corpus = tm_map(corpus, stemDocument, language = "english")
+corpus = tm_map(corpus,PlainTextDocument)
+
+#Build treemap -- not sure this is working properly
+frequencies = DocumentTermMatrix(corpus)
+findFreqTerms(frequencies, lowfreq=20)
+sparse = removeSparseTerms(frequencies, 0.995) 
+sparse
+tweetsSparse = as.data.frame(as.matrix(sparse))
+colnames(tweetsSparse) = make.names(colnames(tweetsSparse))
+tweetsSparse$scorescat = some_tweets$scorescat
+split = sample.split(tweetsSparse$scorescat, SplitRatio = 0.7)
+train = subset(tweetsSparse, split==TRUE)
+test = subset(tweetsSparse, split==FALSE)
+
+# Run Confusion Matrix and Prediction Model
+tweetTREE = rpart(scorescat ~ ., data=train, method="class")
+predictTREE = predict(tweetTREE, newdata=test, type="class")
+
+
+
+
