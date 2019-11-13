@@ -13,7 +13,7 @@
 #             Analyzing Data from Twitter using R. Information Systems Education Journal.
 #             Retrieved from: http://isedj.org/2017-15/n3/ISEDJv15n3p42.pdf
 #
-#           Before proceeding, user must set up a Twitter API Application at http://apps.twitter.com
+#           Before proceeding, user must set up a Twitter API Application at http://developer.twitter.com
 #           see authenticate.R
 #           
 
