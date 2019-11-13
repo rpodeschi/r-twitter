@@ -2,7 +2,8 @@
 #   Date:        November 21, 2017
 #   Author:      Jake Tolbert & RJ Podeschi
 # 
-#   Purpose:     Authenticate using Twitter API from https://apps.twitter.com
+#   Purpose:     Authenticate using Twitter API from https://developer.twitter.com
+#   Uses:        config.R to pass in Twitter authentication keys.
     
 # libraries ---------------------------------------------------------------
 
