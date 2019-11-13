@@ -81,7 +81,7 @@ DataSetTweets$text <- as.factor(DataSetTweets$text)
 tweets.scores = score.sentiment(DataSetTweets$text, pos.words, neg.words, .progress='text')
 
 # Write scores to tweetScores.csv
-path <- "c:/users/rpodeschi/Documents/r-twitter/data"
+path <- "c:/users/yourusername/Documents/r-twitter/data"
 write.csv(tweets.scores, file=paste(path,"tweetScores.csv", sep=""), row.names=TRUE)
 
 # View histogram of scores. Scores > 0 are positive, Scores < 0 are negative. 0 is neutral
