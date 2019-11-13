@@ -16,7 +16,7 @@
 #           Sentiment Analysis also adopted by: https://analyzecore.com/2014/04/28/twitter-sentiment-analysis/
 #           See https://sites.google.com/site/miningtwitter/questions/sentiment/analysis for more examples
 #
-#           Before proceeding, user must set up a Twitter API Application at http://apps.twitter.com
+#           Before proceeding, user must set up a Twitter API Application at http://developer.twitter.com
 #           see authenticate.R
 # 
 
