@@ -34,7 +34,7 @@ library(wordcloud)
 # Harvest tweets
 
 # Pulls tweets for a given search string since a provided date. Uncomment/Comment for variation
-tweets_orig = searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="en", since="2017-11-13", resultType="recent")
+tweets_orig = searchTwitter("#MondayMotivation", retryOnRateLimit=120, lang="en", since="2020-10-26", resultType="recent")
 # Pulls tweets for a given search string for a given geographical circle.
 # tweets = searchTwitter("#MondayMotivation",n=2500, retryOnRateLimit=120, lang="en", geocode="37.7749,-122.4194,100 mi", since="2017-10-29", resultType="recent")
 
